@@ -1,0 +1,114 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Package classification of Product API\nDocumentation for product API",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/products": {
+      "get": {
+        "description": "Returns a list of products",
+        "tags": [
+          "products"
+        ],
+        "operationId": "listProducts",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/productsResponse"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "delete": {
+        "description": "Delete a product",
+        "tags": [
+          "products"
+        ],
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "ID",
+            "description": "The id of the product to delete from the database",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/noContent"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Product": {
+      "description": "Product defines the structure for an API Product",
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "x-go-name": "CreatedOn"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "id": {
+          "description": "the id for this user",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "x-go-name": "Price"
+        },
+        "sku": {
+          "type": "string",
+          "x-go-name": "SKU"
+        },
+        "updated_at": {
+          "type": "string",
+          "x-go-name": "UpdatedOn"
+        }
+      },
+      "x-go-package": "main.go/data"
+    }
+  },
+  "responses": {
+    "noContent": {},
+    "productsResponse": {
+      "description": "A list of products returns in the response",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Product"
+        }
+      }
+    }
+  }
+}
