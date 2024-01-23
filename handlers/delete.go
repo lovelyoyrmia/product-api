@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	"main.go/data"
 )
 
@@ -15,11 +13,7 @@ import (
 
 // DeleteProduct deletes a product from the database
 func (p *Products) DeleteProduct(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, er := strconv.Atoi(vars["id"])
-	if er != nil {
-		http.Error(rw, "Cannot convert id", http.StatusBadRequest)
-	}
+	id := getProductID(r)
 	prod := r.Context().Value(KeyProduct{}).(data.Product)
 
 	err := data.DeleteProduct(id, &prod)

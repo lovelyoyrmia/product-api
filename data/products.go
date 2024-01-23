@@ -14,32 +14,31 @@ import (
 // swagger:model
 type Product struct {
 	// the id for this user
-	// 
+	//
 	// required: true
 	// min: 1
-	ID				int `json:"id"`
-	Name			string `json:"name" validate:"required"`
-	Description		string `json:"description"`
-	Price			float32 `json:"price" validate:"gt=0"`
-	SKU				string `json:"sku" validate:"required,sku"`
-	CreatedOn		string `json:"created_at"`
-	UpdatedOn		string `json:"updated_at"`
-	DeletedOn		string `json:"-"`
+	ID          int     `json:"id"`
+	Name        string  `json:"name" validate:"required"`
+	Description string  `json:"description"`
+	Price       float32 `json:"price" validate:"gt=0"`
+	SKU         string  `json:"sku" validate:"required,sku"`
+	CreatedOn   string  `json:"created_at"`
+	UpdatedOn   string  `json:"updated_at"`
+	DeletedOn   string  `json:"-"`
 }
-
 
 func (p *Product) FromJson(r io.Reader) error {
 	e := json.NewDecoder(r)
 	return e.Decode(p)
 }
 
-func (p *Product) Validate() error  {
+func (p *Product) Validate() error {
 	validate := validator.New()
 	validate.RegisterValidation("sku", validateSKU)
 	return validate.Struct(p)
 }
 
-func validateSKU(fl validator.FieldLevel) bool  {
+func validateSKU(fl validator.FieldLevel) bool {
 	re := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
 	matches := re.FindAllString(fl.Field().String(), -1)
 	return len(matches) == 1
@@ -52,16 +51,33 @@ func (p *Products) ToJson(w io.Writer) error {
 	return e.Encode(p)
 }
 
-func GetProducts() Products  {
+func GetProducts() Products {
 	return productList
 }
 
-func AddProduct(p *Product)  {
+func AddProduct(p *Product) {
 	p.ID = getNextID()
 	productList = append(productList, p)
 }
 
-func UpdateProduct(id int, p *Product)  error {
+func getNextID() int {
+	lp := productList[len(productList)-1]
+	return lp.ID + 1
+}
+
+func GetProductDetail(id int) (Products, error) {
+	_, pos, err := findProduct(id)
+	if err != nil {
+		return nil, err
+	}
+	nerProduct := []*Product{
+		productList[pos],
+	}
+
+	return nerProduct, nil
+}
+
+func UpdateProduct(id int, p *Product) error {
 	_, pos, err := findProduct(id)
 	if err != nil {
 		return err
@@ -71,7 +87,7 @@ func UpdateProduct(id int, p *Product)  error {
 	return nil
 }
 
-func DeleteProduct(id int, p *Product)  error {
+func DeleteProduct(id int, p *Product) error {
 	_, pos, err := findProduct(id)
 	if err != nil {
 		return err
@@ -92,29 +108,23 @@ func findProduct(id int) (*Product, int, error) {
 	return nil, -1, ErrProductNotFound
 }
 
-
-func getNextID() int {
-	lp := productList[len(productList) - 1]
-	return lp.ID + 1
-}
-
 var productList = []*Product{
 	{
-		ID: 1,
-		Name: "Latte",
+		ID:          1,
+		Name:        "Latte",
 		Description: "Frostry",
-		Price: 2.45,
-		SKU: "abcd123",
-		CreatedOn: time.Now().UTC().String(),
-		UpdatedOn: time.Now().UTC().String(),
+		Price:       2.45,
+		SKU:         "abcd123",
+		CreatedOn:   time.Now().UTC().String(),
+		UpdatedOn:   time.Now().UTC().String(),
 	},
 	{
-		ID: 2,
-		Name: "Latte",
+		ID:          2,
+		Name:        "Latte",
 		Description: "Frostry",
-		Price: 2.45,
-		SKU: "abcd123",
-		CreatedOn: time.Now().UTC().String(),
-		UpdatedOn: time.Now().UTC().String(),
-	},	
+		Price:       2.45,
+		SKU:         "abcd123",
+		CreatedOn:   time.Now().UTC().String(),
+		UpdatedOn:   time.Now().UTC().String(),
+	},
 }

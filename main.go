@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	
+
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
 	ph := handlers.NewProducts(l)
@@ -25,6 +25,7 @@ func main() {
 
 	getRouter := sm.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", ph.GetProducts)
+	getRouter.HandleFunc("/{id:[0-9]+}", ph.GetDetailProduct)
 
 	// sm.Use()
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
@@ -37,30 +38,30 @@ func main() {
 
 	deleteRouter := sm.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/{id:[0-9]+}", ph.DeleteProduct)
- 
+
 	ops := middleware.RedocOpts{SpecURL: "/swagger.json"}
-	sh := middleware.Redoc(ops, nil) 
+	sh := middleware.Redoc(ops, nil)
 	getRouter.Handle("/docs", sh)
 	getRouter.Handle("/swagger.json", http.FileServer(http.Dir("./")))
 
 	bindAddress := ":9090"
 
 	s := http.Server{
-		Addr: bindAddress,
-		Handler: sm,
-		ErrorLog: l,
-		ReadTimeout: 5 * time.Second,
+		Addr:         bindAddress,
+		Handler:      sm,
+		ErrorLog:     l,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
-		IdleTimeout: 5 * time.Second,
+		IdleTimeout:  5 * time.Second,
 	}
 
-	go func ()  {
+	go func() {
 		l.Println("Starting server on port 9090")
 		err := s.ListenAndServe()
 		if err != nil {
 			l.Printf("Error starting server : %s\n", err)
 			os.Exit(1)
-		}	
+		}
 	}()
 
 	sigChan := make(chan os.Signal)
